@@ -1,0 +1,8 @@
+POOL:
+
+./asadmin create-jdbc-connection-pool --datasourceclassname org.mariadb.jdbc.MariaDbDataSource --restype javax.sql.DataSource --property user=root:password=TuContraseña:driverClass=org.mariadb.jdbc.Driver:servername=localhost:portnumber=3306:databasename=personasDB poolPersonas
+
+RECURSO:
+
+./asadmin create-jdbc-resource --connectionpoolid poolPersonas jdbc/personas
+
