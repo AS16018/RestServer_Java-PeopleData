@@ -18,14 +18,86 @@
     
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.core</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.asm</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.antlr</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>javax.persistence</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+            <version>2.5.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>${jakartaee}</version>
+            <version>8.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>8.0.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>fish.payara.extras</groupId>
+            <artifactId>payara-micro</artifactId>
+            <version>5.201</version>
             <scope>provided</scope>
+        </dependency>
+        <!--Para los JWT-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.10.3</version>
+        </dependency>
+        <!--Usar encriptación en contraseñas e implementa OpenBSD-style Blowfish password hashing-->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <!--Convertir a formato JSON-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.19</version>
         </dependency>
     </dependencies>
     
      <build>
+        <finalName>serverPeople</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -47,31 +119,76 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
+     
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <id>copy-payara-micro</id>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${endorsed.dir}</outputDirectory>
+                            <outputDirectory>target</outputDirectory>
+                            <stripVersion>true</stripVersion>
                             <silent>true</silent>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>javax</groupId>
-                                    <artifactId>javaee-api</artifactId>
-                                    <version>${jakartaee}</version>
+                                    <groupId>fish.payara.extras</groupId>
+                                    <artifactId>payara-micro</artifactId>
                                     <type>jar</type>
                                 </artifactItem>
+                                        
+                                <artifactItem>
+                                    <groupId>javax</groupId>
+                                    <artifactId>javaee-endorsed-api</artifactId>
+                                    <version>7.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                
                             </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>fish.payara.extras</groupId>
+                        <artifactId>payara-micro</artifactId>
+                        <version>5.201</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>payara-uber-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>target/payara-micro.jar</argument>
+                                <argument>--port</argument>
+                                <argument>9595</argument>
+                                <argument>--logo</argument>
+                                <argument>--nocluster</argument>
+                                <argument>--deploy</argument>
+                                <argument>${basedir}/target/${project.build.finalName}.war</argument>
+                                <argument>--outputuberjar</argument>
+                                <argument>${basedir}/target/${project.build.finalName}.jar</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>             
         </plugins>
     </build>
 </project>
