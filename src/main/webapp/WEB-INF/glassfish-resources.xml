@@ -9,7 +9,7 @@
         <property name="databaseName" value="personasdb"/>
         <property name="User" value="aragon598"/>
         <property name="Password" value="ajar24332"/>
-        <property name="URL" value="jdbc:mariadb://db4free.net:3306/personasdb?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;useSSL=false"/>
+        <property name="URL" value="jdbc:mysql://db4free.net:3306/personasdb?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;useSSL=false"/>
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
        
     </jdbc-connection-pool>
