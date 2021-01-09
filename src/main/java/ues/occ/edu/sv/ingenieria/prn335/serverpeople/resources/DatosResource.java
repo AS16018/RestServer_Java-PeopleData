@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import ues.occ.edu.sv.ingenieria.prn335.serverpeople.entity.Datos;
 import ues.occ.edu.sv.ingenieria.prn335.serverpeople.entity.DatosFacade;
+import ues.occ.edu.sv.ingenieria.prn335.serverpeople.entity.Login;
 
 /**
  *
@@ -118,12 +119,21 @@ public class DatosResource implements Serializable{
 
 
     @POST
+    @Path("crear")
     @Consumes(value = MediaType.APPLICATION_JSON)
     public Response crearUser(Datos datos) {
-
+        
         try {
             if (datosFacade != null && datos != null) {
-                datosFacade.create(datos);
+                String comproEmail = this.validarEmail(datos.getEmail());
+                
+                if (comproEmail.equals("valido")) {
+                    datosFacade.create(datos);
+                }
+                else{
+                    return Response.status(Response.Status.BAD_REQUEST).entity("El nombre del email ya se encuentra en uso").build();
+                }
+                
             }
             if (datos == null) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Datos nulos").build();
@@ -178,6 +188,57 @@ public class DatosResource implements Serializable{
 
         return Response.ok().build();
     }
+    
+    @POST
+    @Path("login")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    public Response validarLogin(Login login) {
+        
+        List<Datos> user = null;
+        
+        try {
+            if (datosFacade != null && login != null) {
+                user = datosFacade.findAll().stream().filter(e -> e.getEmail().equals(login.getEmail())).collect(Collectors.toList());
+                
+            }
+            if (login == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Datos nulos").build();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        
+        if (user==null || user.size()<1) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("El Email es invalido").build();
+            
+        }else if (!user.get(0).getPassword().equals(login.getPassword())) {
+           return Response.status(Response.Status.BAD_REQUEST).entity("La contraseña es invalida").build();
+        }
+        login.setEmail(user.get(0).getNombre());
+        login.setPassword(user.get(0).getApellido());
+        return Response.ok(login).build();
+    }
+    
+    public String validarEmail(String email){
+        String validarEmail = "";
+        String result = "";
+        try {
+            if (email !=null) {
+               validarEmail = datosFacade.findAll().stream().filter(e -> e.getEmail().equals(email)).collect(Collectors.toList()).get(0).getEmail();
+            }
+            
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        if (validarEmail.equals("")) {
+            result = "valido";
+        }else{
+            result = "invalido";
+        }
+        return result;
+    }
+    
+    
 
     public DatosFacade getDatosFacade() {
         return datosFacade;
