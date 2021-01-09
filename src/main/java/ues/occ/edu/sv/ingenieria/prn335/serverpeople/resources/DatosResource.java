@@ -213,7 +213,7 @@ public class DatosResource implements Serializable{
             return Response.status(Response.Status.BAD_REQUEST).entity("El Email es invalido").build();
             
         }else if (!user.get(0).getPassword().equals(login.getPassword())) {
-           return Response.ok("La contraseña es invalida").build();
+           return Response.status(Response.Status.BAD_REQUEST).entity("La contraseña es invalida").build();
         }
         login.setEmail(user.get(0).getNombre());
         login.setPassword(user.get(0).getApellido());
