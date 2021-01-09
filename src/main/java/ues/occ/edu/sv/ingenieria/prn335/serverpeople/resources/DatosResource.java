@@ -128,6 +128,7 @@ public class DatosResource implements Serializable{
                 String comproEmail = this.validarEmail(datos.getEmail());
                 
                 if (comproEmail.equals("valido")) {
+                    datos.setId(this.obtenerUltimoId());
                     datosFacade.create(datos);
                 }
                 else{
@@ -236,6 +237,24 @@ public class DatosResource implements Serializable{
             result = "invalido";
         }
         return result;
+    }
+    
+    public Integer obtenerUltimoId(){
+        Integer idMayor = 0;
+        try {
+            if (datosFacade != null) {
+                idMayor = datosFacade.findAll().stream().max((id1, id2) -> id1.getId() - id2.getId()).get().getId();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        if (idMayor == 0 || idMayor == null) {
+            idMayor = 1;
+        }
+        else{
+            idMayor = idMayor+1;
+        }
+        return idMayor;
     }
     
     
