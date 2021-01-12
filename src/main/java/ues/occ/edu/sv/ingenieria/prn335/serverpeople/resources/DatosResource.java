@@ -196,6 +196,9 @@ public class DatosResource implements Serializable{
     public Response validarLogin(Login login) {
         
         List<Datos> user = null;
+        login.setErrorEmail("");
+        login.setExito("");
+        login.setErrorPassword("");
         
         try {
             if (datosFacade != null && login != null) {
@@ -210,14 +213,17 @@ public class DatosResource implements Serializable{
         }
         
         if (user==null || user.size()<1) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("El Email es invalido").build();
+            login.setErrorEmail("El email "+login.getEmail()+" es invalido, por favor intente nuevamente");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(login).build();
             
         }else if (!user.get(0).getPassword().equals(login.getPassword())) {
-           return Response.status(Response.Status.BAD_REQUEST).entity("La contraseña es invalida").build();
+            login.setErrorPassword("La contraseña que intenta ingresar es inválida, por favor intente nuevamente");
+           return Response.status(Response.Status.UNAUTHORIZED).entity(login).build();
         }
         login.setEmail(user.get(0).getNombre());
         login.setPassword(user.get(0).getApellido());
-        return Response.ok(login).build();
+        login.setExito("Inicio de sesión exitosa");
+        return Response.status(Response.Status.ACCEPTED).entity(login).build();
     }
     
     public String validarEmail(String email){
