@@ -214,11 +214,11 @@ public class DatosResource implements Serializable{
         
         if (user==null || user.size()<1) {
             login.setErrorEmail("El email "+login.getEmail()+" es invalido, por favor intente nuevamente");
-            return Response.status(Response.Status.UNAUTHORIZED).entity(login).build();
+            return Response.ok(login).build();
             
         }else if (!user.get(0).getPassword().equals(login.getPassword())) {
             login.setErrorPassword("La contraseña que intenta ingresar es inválida, por favor intente nuevamente");
-           return Response.status(Response.Status.UNAUTHORIZED).entity(login).build();
+           return Response.ok(login).build();
         }
         login.setEmail(user.get(0).getNombre());
         login.setPassword(user.get(0).getApellido());
