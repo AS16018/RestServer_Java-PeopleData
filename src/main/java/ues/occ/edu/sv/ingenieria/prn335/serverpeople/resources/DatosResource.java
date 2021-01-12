@@ -132,7 +132,8 @@ public class DatosResource implements Serializable{
                     datosFacade.create(datos);
                 }
                 else{
-                    return Response.status(Response.Status.BAD_REQUEST).entity("El nombre del email ya se encuentra en uso").build();
+                    datos.setNombre("El email "+datos.getEmail()+" ya ha sido registrado");
+                    return Response.ok(datos).build();
                 }
                 
             }
