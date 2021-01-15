@@ -76,7 +76,68 @@ public class DatosResource implements Serializable{
         return Response.noContent().build();
     }
 
-    @POST
+    @GET
+    @Path("buscarEmail/{email}")
+    @Produces(value = MediaType.APPLICATION_JSON)
+    public Response findByEmail(@PathParam("email") String email) {
+        List<Datos> datoE = null;
+        try {
+            if (datosFacade != null && email != null) {
+                 datoE = datosFacade.findAll().stream().filter(e -> e.getEmail().equals(email)).collect(Collectors.toList());
+                if (datoE == null) {
+                    return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
+                } else {
+                    return Response.ok(datoE).build();
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return Response.noContent().build();
+    }
+
+    @GET
+    @Path("range")
+    @Produces(value = MediaType.APPLICATION_JSON)
+    public Response findRange(
+            @DefaultValue("0") @QueryParam("primero") int primero,
+            @DefaultValue("5") @QueryParam("ultimo") int ultimo) {
+        List salida = null;
+        try {
+            if (datosFacade != null) {
+                salida = datosFacade.findRange(primero, ultimo);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        } finally {
+            if (salida == null) {
+                salida = new ArrayList();
+            }
+        }
+
+        return Response.ok(salida).build();
+    }
+
+    @GET
+    @Path("count")
+    @Produces(value = MediaType.TEXT_PLAIN)
+    public Response count() {
+        Integer total = 0;
+        try {
+            if (datosFacade != null) {
+                total = datosFacade.count();
+            }
+            if (total != 0 && !total.equals(null)) {
+                return Response.ok(total).build();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+
     @Path("crear")
     @Consumes(value = MediaType.APPLICATION_JSON)
     public Response crearUser(Datos datos) {
